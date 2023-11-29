@@ -1,4 +1,3 @@
-from splitutils import optimize_traindevtest_split
 import numpy as np
 import os
 import pandas as pd
@@ -7,6 +6,7 @@ import sys
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
+from splitutils import optimize_traindevtest_split
 
 """ 
 example script how to split dummy data into training, development,
