@@ -559,13 +559,6 @@ learning, arXiv:TBA.
   title = 	 {Group-disjunct and stratified data partitioning for machine
 learning},
   institution =  {audEERING GmbH},
-  year = 	 {2023},
-  OPTkey = 	 {},
-  OPTtype = 	 {},
-  OPTnumber = 	 {},
-  OPTaddress = 	 {},
-  OPTmonth = 	 {},
-  OPTnote = 	 {},
-  OPTannote = 	 {}
+  year = 	 {2023}
 }
 ```
