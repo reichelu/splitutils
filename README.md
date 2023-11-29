@@ -559,6 +559,7 @@ learning, arXiv:TBA.
   title = 	 {Group-disjunct and stratified data partitioning for machine
 learning},
   institution =  {audEERING GmbH},
-  year = 	 {2023}
+  year = 	 {2023},
+  note =         {arXiv:TBA}
 }
 ```
