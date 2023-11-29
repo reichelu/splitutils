@@ -1,3 +1,4 @@
+from splitutils import optimize_traintest_split
 import numpy as np
 import os
 import pandas as pd
@@ -6,9 +7,9 @@ import sys
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
-from splitutils import optimize_traintest_split
 
 # tests traintest split
+
 
 def test_traintest_split():
     seed = 42
@@ -59,7 +60,7 @@ def test_traintest_split():
         'p_strat_var2_ref': {'O': 0.48, 'N': 0.52},
         'p_strat_var2_test': {'O': 0.48148148148148145, 'N': 0.5185185185185185}
     }
-    
+
     # list of mismatching keys
     mismatches = []
     for key in info:
@@ -77,7 +78,7 @@ def test_traintest_split():
 
     print("ok!")
     return True
- 
-    
+
+
 if __name__ == "__main__":
     test_traintest_split()

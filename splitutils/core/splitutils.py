@@ -70,7 +70,7 @@ def optimize_traindevtest_split(
         "p_dev_{c}": dev set class distribution calculated from stratify_on[c][dev_i]
         "p_test_{c}": test set class distribution calculated from stratify_on[c][test_i]
     '''
-    
+
     # data size
     N = len(y)
 
@@ -79,7 +79,7 @@ def optimize_traindevtest_split(
         f"all stratify_on arrays must have length {N}"
     assert size_check(split_on, N), \
         f"split_on array must have length {N}"
-    
+
     # categorical target: get number of classes for coverage test
     if is_categorical(y[0]):
         nc = len(set(y))
@@ -88,7 +88,7 @@ def optimize_traindevtest_split(
 
     # adjusted dev_size after having split off the test set
     dev_size_adj = (dev_size * N) / (N - test_size * N)
-    
+
     # split all into train/dev vs test
     gss_o = GroupShuffleSplit(n_splits=k, test_size=test_size,
                               random_state=seed)
@@ -119,7 +119,7 @@ def optimize_traindevtest_split(
 
     # for appropriate subsetting
     xtype = type(X)
-    
+
     # brute-force optimization of SPLIT_ON split
     #    outer loop *_o: splitting into train/dev and test
     #    inner loop *_i: spltting into train and dev
@@ -132,7 +132,7 @@ def optimize_traindevtest_split(
             X_i = X[tri_o]
         y_i = y[tri_o]
         split_on_i = split_on[tri_o]
-        
+
         for tri_i, tei_i in gss_i.split(X_i, y_i, split_on_i):
 
             # all classes maintained in all partitions?
@@ -218,7 +218,7 @@ def optimize_traintest_split(
     test_size: (float) test proportion in set(split_on), e.g. 10% of speakers to be held-out
     k: (int) number of different splits to be tried out
     seed: (int) random seed
-    
+
     Returns:
     train_i: (np.array) train set indices in X
     test_i: (np.array) test set indices in X
@@ -240,7 +240,7 @@ def optimize_traintest_split(
         f"all stratify_on arrays must have length {N}"
     assert size_check(split_on, N), \
         f"split_on array must have length {N}"
-    
+
     # set weight defaults
     if weight is None:
         weight = {}
@@ -257,7 +257,7 @@ def optimize_traintest_split(
 
     # best train and test indices in X; best associated score
     train_i, test_i, best_sco = None, None, np.inf
-    
+
     # full target coverage in all partitions
     full_target_coverage = False
 
@@ -302,7 +302,6 @@ def binning(x: Union[list, np.array],
             nbins: int = 2,
             lower_boundaries: Union[list, np.array, dict] = None,
             seed: int = 42) -> np.array:
-
     ''' 
     bins numeric data.
 
@@ -330,9 +329,9 @@ def binning(x: Union[list, np.array],
         "One of nbins or lower_boundaries must be set."
 
     x = np.array(x, dtype=float)
-    
+
     assert ((nbins is not None) or x.ndim == 1), \
-        "For 2-dimensional data input nbins must be set for KMeans clustering." 
+        "For 2-dimensional data input nbins must be set for KMeans clustering."
 
     if x.ndim == 1:
         # 1-dim array
@@ -484,7 +483,7 @@ def size_check(d=Union[list, np.array, dict, pd.DataFrame], n=int):
     Args:
     d: (list, np.array, dict, pd.DataFrame) input data
     n: (int) reference length
-    
+
     Returns:
     boolean: True if size requirement is met
     '''
@@ -521,10 +520,9 @@ def class_prob(y: Union[np.array, list]) -> float:
 
 
 def is_categorical(x: Any) -> bool:
-
     ''' returns True if type of x is in str or int*,
     else False '''
-    
+
     if type(x) in [str, int, np.int16, np.int32, np.int64,
                    np.uint8, np.uint16, np.uint32]:
         return True

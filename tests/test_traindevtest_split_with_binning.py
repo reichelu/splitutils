@@ -1,3 +1,7 @@
+from splitutils import (
+    binning,
+    optimize_traindevtest_split
+)
 import numpy as np
 import os
 import pandas as pd
@@ -6,11 +10,7 @@ import sys
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
-from splitutils import (
-    binning,
-    optimize_traindevtest_split
-)
-    
+
 def test_traindevtest_split_with_binning():
     seed = 42
     np.random.seed(seed)
@@ -69,6 +69,7 @@ def test_traindevtest_split_with_binning():
 
     print("ok!")
     return True
+
 
 if __name__ == "__main__":
     test_traindevtest_split_with_binning()

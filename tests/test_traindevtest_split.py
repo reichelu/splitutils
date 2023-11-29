@@ -1,3 +1,4 @@
+from splitutils import optimize_traindevtest_split
 import numpy as np
 import os
 import pandas as pd
@@ -6,9 +7,9 @@ import sys
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
-from splitutils import optimize_traindevtest_split
 
 # tests traindevtest split
+
 
 def test_traindevtest_split():
 
@@ -17,7 +18,7 @@ def test_traindevtest_split():
     n = 100
 
     data = np.random.rand(n, 20)
-    
+
     target = np.random.choice(["A", "B"], size=n, replace=True)
     split_var = np.random.choice(["D", "E", "F", "G", "H", "I", "J", "K"],
                                  size=n, replace=True)
@@ -85,7 +86,7 @@ def test_traindevtest_split():
 
     print("ok!")
     return True
- 
-    
+
+
 if __name__ == "__main__":
     test_traindevtest_split()
