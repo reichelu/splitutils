@@ -13,8 +13,7 @@
         - [Example 2: split dummy data into training, development, and test partitions](#example2)
         - [Example 3: split dummy data into training, development, and test partitions, the target and several stratification variables being numeric](#example3)
     - [Algorithm](#algorithm)
-    - [How to interprete the returned info dict](#interpretation)
-    - [Further documentation](#doc)
+    - [How to interpret the returned info dict](#interpretation)
 
 ## <a name="author">Author</a>
 
@@ -480,7 +479,7 @@ max_d: maximum of absolute difference between proportions of X and G (see above)
 w(d): its weight
 ```
 
-## <a name="interpretation">How to interprete the returned `info` dict</a>
+## <a name="interpretation">How to interpret the returned `info` dict</a>
 
 * let's look at [Example 2](#example2) above. There `info` becomes:
 
@@ -522,7 +521,4 @@ w(d): its weight
     * for `splitutils.optimize_traintest_split()` no development set results are reported
     * all `*_strat_var*` keys: key names derived from key names in `stratify_on` argument
 
-## <a name="doc">Further documentation</a>
-
-* Please find further details on the split scores and numeric variable binning in this [pdf](https://github.com/reichelu/splitutils/blob/main/docs/splitutils.pdf)
 
