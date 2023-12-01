@@ -41,7 +41,7 @@ $ source venv_splitutils/bin/activate
 ### From GitHub
 
 * project URL: https://github.com/reichelu/splitutils
-* set up a virtual environment venv_copasul, activate it, and install requirements. For Linux this works e.g. as follows:
+* set up a virtual environment venv_splitutils, activate it, and install requirements. For Linux this works e.g. as follows:
 
 ```bash
 $ git clone git@github.com:reichelu/spliutils.git
