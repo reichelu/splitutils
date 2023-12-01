@@ -256,7 +256,7 @@ print("test levels of split_var:", sorted(set(split_var[test_i])))
 print("goodness of split:", info)
 ```
 
-### <a name="example2">Example 2: Split dummy data into training, development, and test partitionsy</a>
+### <a name="example2">Example 2: Split dummy data into training, development, and test partitions</a>
 
 * see `scripts/run_traindevtest_split.py`
 * Partitions are
