@@ -14,21 +14,17 @@
         - [Example 3: split dummy data into training, development, and test partitions, the target and several stratification variables being numeric](#example3)
     - [Algorithm](#algorithm)
     - [How to interprete the returned info dict](#interpretation)
-    - [Reference](#reference)
+    - [Further documentation](#doc)
 
 ## <a name="author">Author</a>
 
 Uwe Reichel, audEERING GmbH, Gilching, Germany
-
-[back](#contents)
 
 ## <a name="purpose">Purpose</a>
 
 * machine learning data splitting tool that allows for:
   * group-disjunct splits (e.g. different speakers in train, dev, and test partition)
   * stratification on multiple target and grouping variables (e.g. emotion, gender, language)
-
-[back](#contents)
 
 ## <a name="installation">Installation</a>
 
@@ -55,11 +51,7 @@ $ source venv_splitutils/bin/activate
 $ (venv_splitutils) $ pip install -r requirements.txt
 ```
 
-[back](#contents)
-
 ## <a name="synopsis">Synopsis</a>
-
-[back](#contents)
 
 ### <a name="otts">optimize_traintest_split()</a>
 
@@ -103,8 +95,6 @@ def optimize_traintest_split(X, y, split_on, stratify_on, weight=None,
         "p_test_{c}": test set class distribution calculated from stratify_on[c][test_i]
     '''
 ```
-
-[back](#contents)
 
 ### <a name="otdts">optimize_traindevtest_split()</a>
 
@@ -156,8 +146,6 @@ def optimize_traindevtest_split(X, y, split_on, stratify_on, weight=None,
     '''
 ```
 
-[back](#contents)
-
 ### <a name="binning">binning()</a>
 
 ```python
@@ -187,11 +175,8 @@ def binning(x, nbins=2, lower_boundaries=None, seed=42):
     c: (np.array) integers as bin IDs
     '''
 ```
-[back](#contents)
 
 ## <a name="usage">Usage</a>
-
-[back](#contents)
 
 ### <a name="example1">Example 1: Split dummy data into training and test partitions</a>
 
@@ -271,8 +256,6 @@ train_i, test_i, info = optimize_traintest_split(
 print("test levels of split_var:", sorted(set(split_var[test_i])))
 print("goodness of split:", info)
 ```
-
-[back](#contents)
 
 ### <a name="example2">Example 2: Split dummy data into training, development, and test partitionsy</a>
 
@@ -354,8 +337,6 @@ train_i, dev_i, test_i, info = optimize_traindevtest_split(
 print("test levels of split_var:", sorted(set(split_var[test_i])))
 print("goodness of split:", info)
 ```
-
-[back](#contents)
 
 ### <a name="example3">Example 3: Split dummy data into training, development, and test partitions, the target and several stratification variables being numeric</a>
 
@@ -464,8 +445,6 @@ print("test levels of split_var:", sorted(set(split_var[test_i])))
 print("goodness of split:", info)
 ```
 
-[back](#contents)
-
 ## <a name="algorithm">Algorithm</a>
 
 * find optimal train, dev, and test set split based on:
@@ -543,23 +522,7 @@ w(d): its weight
     * for `splitutils.optimize_traintest_split()` no development set results are reported
     * all `*_strat_var*` keys: key names derived from key names in `stratify_on` argument
 
-[back](#contents)
+## <a name="doc">Further documentation</a>
 
+* Please find further details on the split scores and numeric variable binning in this [pdf](https://github.com/reichelu/splitutils/blob/main/docs/splitutils.pdf)
 
-## <a name="reference">Reference</a>
-
-If you use `splitutils` in a scientific publication, we would appreciate citations to the following publication:
-
-* Reichel, U. (2023). Group-disjunct and stratified data partitioning for machine
-learning, arXiv:TBA.
-
-```
-@TechReport{splitutils,
-  author = 	 {Reichel, Uwe},
-  title = 	 {Group-disjunct and stratified data partitioning for machine
-learning},
-  institution =  {audEERING GmbH},
-  year = 	 {2023},
-  note =         {arXiv:TBA}
-}
-```
