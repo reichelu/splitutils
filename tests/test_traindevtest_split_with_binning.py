@@ -51,25 +51,15 @@ def test_traindevtest_split_with_binning():
         'score': 0.07371591554676618, 'size_devset_in_spliton': 0.1, 'size_devset_in_X': 0.15, 'size_testset_in_spliton': 0.1, 'size_testset_in_X': 0.12, 'p_target_ref': {0: 0.34, 2: 0.34, 1: 0.32}, 'p_target_dev': {0: 0.26666666666666666, 2: 0.3333333333333333, 1: 0.4}, 'p_target_test': {0: 0.4166666666666667, 2: 0.3333333333333333, 1: 0.25}, 'p_strat_var_ref': {4: 0.2, 2: 0.19, 3: 0.18, 0: 0.11, 5: 0.13, 1: 0.19}, 'p_strat_var_dev': {2: 0.2, 4: 0.2, 3: 0.26666666666666666, 5: 0.06666666666666667, 0: 0.13333333333333333, 1: 0.13333333333333333}, 'p_strat_var_test': {2: 0.25, 4: 0.25, 5: 0.16666666666666666, 1: 0.16666666666666666, 0: 0.08333333333333333, 3: 0.08333333333333333}
     }
 
-    # list of mismatching keys
-    mismatches = []
     for key in info:
         if type(info[key]) is not dict:
-            if np.round(info[key], 4) != np.round(reference[key], 4):
-                mismatches.append(key)
+            assert np.round(info[key], 4) == np.round(reference[key], 4), \
+                f"test fails for {key}"
+            
         else:
             for subkey in info[key]:
-                if np.round(info[key][subkey], 4) != \
-                   np.round(reference[key][subkey], 4):
-                    mismatches.append(f"{key}.{subkey}")
-
-    if len(mismatches) > 0:
-        print("mismatches:", mismatches)
-        return False
-
-    print("ok!")
-    return True
-
+                assert np.round(info[key][subkey], 4) == np.round(reference[key][subkey], 4), \
+                    f"test fails for {key}.{subkey}"
 
 if __name__ == "__main__":
     test_traindevtest_split_with_binning()

@@ -69,24 +69,13 @@ def test_traindevtest_split():
         'p_strat_var2_test': {'I': 0.46153846153846156, 'H': 0.5384615384615384}
     }
 
-    # list of mismatching keys
-    mismatches = []
     for key in info:
         if type(info[key]) is not dict:
-            if np.round(info[key], 4) != np.round(reference[key], 4):
-                mismatches.append(key)
+            assert np.round(info[key], 4) == np.round(reference[key], 4), \
+                f"test fails for {key}"
+            
         else:
             for subkey in info[key]:
-                if np.round(info[key][subkey], 4) != np.round(reference[key][subkey], 4):
-                    mismatches.append(f"{key}.{subkey}")
-
-    if len(mismatches) > 0:
-        print("mismatches:", mismatches)
-        return False
-
-    print("ok!")
-    return True
-
-
-if __name__ == "__main__":
-    test_traindevtest_split()
+                assert np.round(info[key][subkey], 4) == np.round(reference[key][subkey], 4), \
+                    f"test fails for {key}.{subkey}"
+            
