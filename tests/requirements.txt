@@ -3,4 +3,4 @@ pandas
 pytest
 scipy
 scikit-learn
-
+splitutils

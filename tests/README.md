@@ -13,7 +13,7 @@ $ source venv_splitutils/bin/activate
 * all tests
 
 ```bash
-(venv_test_splitutils) $ pyptest
+(venv_test_splitutils) $ pytest
 ```
 
 * single test, e.g.

@@ -188,7 +188,6 @@ def binning(x, nbins=2, lower_boundaries=None, seed=42):
 ```python
 import numpy as np
 import os
-import pandas as pd
 import sys
 
 # add this line if you have cloned the code from github to PROJECT_DIR
@@ -267,7 +266,6 @@ print("goodness of split:", info)
 ```python
 import numpy as np
 import os
-import pandas as pd
 import sys
 
 # add this line if you have cloned the code from github to PROJECT_DIR
@@ -342,12 +340,11 @@ print("goodness of split:", info)
 * see `scripts/run_traindevtest_split_with_binning.py`
 * Partitions are
     * disjunct on categorical "split_var"
-    * stratified on numeric "target", and on 3 other numeric stratification variables 
+    * stratified on numeric "target", and on 3 other numeric stratification variables
 
 ```python
 import numpy as np
 import os
-import pandas as pd
 import sys
 
 # add this line if you have cloned the code from github to PROJECT_DIR
