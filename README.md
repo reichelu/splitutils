@@ -393,7 +393,7 @@ binned_target = binning(num_target, nbins=3)
 
 # ... alternatively, a variable can be extrinsically binned by
 # specifying lower boundaries:
-# binned_target = binning(target, lower_boundaries: [0, 0.33, 0.66])
+# binned_target = binning(num_target, lower_boundaries=[0, 0.33, 0.66])
 
 # bin other stratification variables into a single variable with 6 bins
 # (2-dim input is binned by StandardScaling and KMeans clustering)
