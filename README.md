@@ -1,4 +1,4 @@
-# <a name="contents">Machine learning data partition tools</a>
+# <a name="contents">Machine learning data partitioning</a>
 
 - [Contents](#contents)
     - [Author](#author)
@@ -8,6 +8,7 @@
         - [optimize_traintest_split()](#otts)
         - [optimize_traindevtest_split()](#otdts)
         - [binning()](#binning)
+    - [Reference](#reference)
     - [Usage](#usage)
         - [Example 1: Split dummy data into training and test partitions](#example1)
         - [Example 2: split dummy data into training, development, and test partitions](#example2)
@@ -174,6 +175,22 @@ def binning(x, nbins=2, lower_boundaries=None, seed=42):
     c: (np.array) integers as bin IDs
     '''
 ```
+
+## <a name="reference">Reference</a>
+
+if you use this software for a publication please cite:
+
+> **Reichel, U.: splitutils - *machine learning data partitioning software*, version 0.3.0. doi:10.5281/zenodo.10793086, 2024.**
+
+```
+@Misc{splitutils,
+  author =       {Reichel, U.},
+  title =        {splitutils -- machine learning data partitioning software, version 0.3.0},
+  howpublished = {doi:10.5281/zenodo.10793086},
+  year =         {2024}
+}
+```
+
 
 ## <a name="usage">Usage</a>
 
