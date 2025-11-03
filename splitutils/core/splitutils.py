@@ -18,59 +18,63 @@ def optimize_traindevtest_split(
         weight: dict = None,
         dev_size: float = .1,
         test_size: float = .1,
+        testset_not_smaller: bool = False,
         k: int = 30,
-        seed: int = 42) -> Tuple[np.array, np.array, np.array, dict]:
-    ''' optimize group-disjunct split into training, dev, and test set, which is guided by:
-    - disjunct split of values in SPLIT_ON
-    - stratification by all keys in STRATIFY_ON (targets and groupings)
-    - test set proportion in X should be close to test_size (which is the test
-      proportion in set(split_on))
+        seed: int = 42
+) -> Tuple[np.array, np.array, np.array, dict]:
+    """Optimize group-disjunct split into training, dev, and test set, which is guided by:
+        - disjunct split of values in SPLIT_ON
+        - stratification by all keys in STRATIFY_ON (targets and groupings)
+        - test set proportion in X should be close to test_size (which is the test
+          proportion in set(split_on))
 
     Score to be minimized: (sum_v[w(v) * max_irad(v)] + w(d) * max_d) / (sum_v[w(v)] + w(d))
-    (v: variables to be stratified on
-    w(v): their weight
-    max_irad(v): maximum information radius of reference distribution of classes in v and
+        (v: variables to be stratified on
+        w(v): their weight
+        max_irad(v): maximum information radius of reference distribution of classes in v and
                  - dev set distribution,
                  - test set distribution
-    N(v): number of stratification variables
-    max_d: maximum of absolute difference between dev and test sizes of X and set(split_on)
-    w(d): its weight
+        N(v): number of stratification variables
+        max_d: maximum of absolute difference between dev and test sizes of X and set(split_on)
+        w(d): its weight
 
     Args:
-    X: (np.array or pd.DataFrame) of features
-    y: (np.array) of targets of length N
-      if type(y[0]) in ["str", "int"]: y is assumed to be categorical, so that it is additionally
-      tested that all partitions cover all classes. Else y is assumed to be numeric and no
-      coverage test is done.
-    split_on: (np.array) list of length N with grouping variable (e.g. speaker IDs),
-      on which the group-disjunct split is to be performed. Must be categorical.
-    stratify_on: (dict) Dict-keys are variable names (targets and/or further groupings)
-      the split should be stratified on (groupings could e.g. be sex, age class, etc).
-      Dict-Values are np.array-s of length N that contain the variable values. All
-      variables must be categorical.
-    weight: (dict) weight for each variable in stratify_on. Defines their amount of
-      contribution to the optimization score. Uniform weighting by default. Additional
-      key: "size_diff" defines how the corresponding size differences should be weighted.
-    dev_size: (float) proportion in set(split_on) for dev set, e.g. 10% of speakers
-      to be held-out
-    test_size: (float) test proportion in set(split_on) for test set
-    k: (int) number of different splits to be tried out
-    seed: (int) random seed
+        X: feature array or table
+        y: targets of length N
+            if type(y[0]) in ["str", "int"]: y is assumed to be categorical,
+            so that it is additionally tested that all partitions cover all classes.
+            Else y is assumed to be numeric and no coverage test is done.
+        split_on: list of length N with grouping variable (e.g. speaker IDs),
+            on which the group-disjunct split is to be performed. Must be categorical.
+        stratify_on: dict with variable names (targets and/or further groupings)
+            the split should be stratified on (groupings could e.g. be sex, age class, etc).
+            Dict-Values are np.array-s of length N that contain the variable values. All
+            variables must be categorical.
+        weight: weight for each variable in stratify_on. Defines their amount of
+            contribution to the optimization score. Uniform weighting by default. Additional
+            key: "size_diff" defines how the corresponding size differences should be weighted.
+        dev_size: devset proportion in set(split_on) for dev set, e.g. 10% of speakers
+            to be held-out
+        test_size: test set proportion in set(split_on) for test set
+        testset_not_smaller: if True, and if test_size >= dev_size, it is ensured, that
+            the resulting test set is not smaller than the dev set
+        k: number of different splits to be tried out
+        seed: random seed
 
     Returns:
-    train_i: (np.array) train set indices in X
-    dev_i: (np.array) dev set indices in X
-    test_i: (np.array) test set indices in X
-    info: (dict) detail information about reference and achieved prob distributions
-        "dev_size_in_spliton": intended grouping dev_size
-        "dev_size_in_X": optimized dev proportion of observations in X
-        "test_size_in_spliton": intended grouping test_size
-        "test_size_in_X": optimized test proportion of observations in X
-        "p_ref_{c}": reference class distribution calculated from stratify_on[c]
-        "p_dev_{c}": dev set class distribution calculated from stratify_on[c][dev_i]
-        "p_test_{c}": test set class distribution calculated from stratify_on[c][test_i]
-    '''
+        train set indices in X
+        dev set indices in X
+        test set indices in X
+        dict with detail information about reference and achieved prob distributions
+            "dev_size_in_spliton": intended grouping dev_size
+            "dev_size_in_X": optimized dev proportion of observations in X
+            "test_size_in_spliton": intended grouping test_size
+            "test_size_in_X": optimized test proportion of observations in X
+            "p_ref_{c}": reference class distribution calculated from stratify_on[c]
+            "p_dev_{c}": dev set class distribution calculated from stratify_on[c][dev_i]
+            "p_test_{c}": test set class distribution calculated from stratify_on[c][test_i]
 
+    """
     # data size
     N = len(y)
 
@@ -161,6 +165,13 @@ def optimize_traindevtest_split(
     if test_i is None:
         sys.exit(exit_message(full_target_coverage, "dev and test"))
 
+    # evtl. swap dev and test indices
+    if test_size >= dev_size and testset_not_smaller:
+        if len(dev_i) > len(test_i):
+            b = test_i
+            test_i = dev_i
+            dev_i = b
+        
     # matching info
     info = {"score": best_sco,
             "size_devset_in_spliton": dev_size,
@@ -172,7 +183,7 @@ def optimize_traindevtest_split(
         info[f"p_{c}_ref"] = p_ref[c]
         info[f"p_{c}_dev"] = class_prob(stratify_on[c][dev_i])
         info[f"p_{c}_test"] = class_prob(stratify_on[c][test_i])
-
+        
     return train_i, dev_i, test_i, info
 
 
@@ -184,51 +195,53 @@ def optimize_traintest_split(
         weight: dict = None,
         test_size: float = .1,
         k: int = 30,
-        seed: int = 42) -> Tuple[np.array, np.array, dict]:
-    ''' optimize group-disjunct split which is guided by:
-    - disjunct split of values in SPLIT_ON
-    - stratification by all keys in STRATIFY_ON (targets and groupings)
-    - test set proportion in X should be close to test_size (which is the test
-      proportion in set(split_on))
+        seed: int = 42
+) -> Tuple[np.array, np.array, dict]:
+    """Optimize group-disjunct split which is guided by:
+
+        - disjunct split of values in SPLIT_ON
+        - stratification by all keys in STRATIFY_ON (targets and groupings)
+        - test set proportion in X should be close to test_size (which is the test
+          proportion in set(split_on))
 
     Score to be minimized: (sum_v[w(v) * irad(v)] + w(d) * d) / (sum_v[w(v)] + w(d))
-    (v: variables to be stratified on
-    w(v): their weight
-    irad(v): information radius between reference distribution of classes in v
+        (v: variables to be stratified on
+        w(v): their weight
+        irad(v): information radius between reference distribution of classes in v
         and test set distribution
-    N(v): number of stratification variables
-    d: absolute difference between test sizes of X and set(split_on)
-    w(d): its weight
+        N(v): number of stratification variables
+        d: absolute difference between test sizes of X and set(split_on)
+        w(d): its weight
 
     Args:
-    X: (np.array or pd.DataFrame) of features
-    y: (np.array) of targets of length N
-      if type(y[0]) in ["str", "int"]: y is assumed to be categorical, so that it is additionally
-      tested that all partitions cover all classes. Else y is assumed to be numeric and no
-      coverage test is done.
-    split_on: (np.array) list of length N with grouping variable (e.g. speaker IDs),
-      on which the group-disjunct split is to be performed. Must be categorical.
-    stratify_on: (dict) Dict-keys are variable names (targets and/or further groupings)
-      the split should be stratified on (groupings could e.g. be sex, age class, etc).
-      Dict-Values are np.array-s of length N that contain the variable values. All
-      variables must be categorical.
-    weight: (dict) weight for each variable in stratify_on. Defines their amount of
-      contribution to the optimization score. Uniform weighting by default. Additional
-      key: "size_diff" defines how test size diff should be weighted.
-    test_size: (float) test proportion in set(split_on), e.g. 10% of speakers to be held-out
-    k: (int) number of different splits to be tried out
-    seed: (int) random seed
+        X: features array or dataframe
+        y: array of targets of length N
+            if type(y[0]) in ["str", "int"]: y is assumed to be categorical, so that it is
+            additionally tested that all partitions cover all classes. Else y is assumed to
+            be numeric and no coverage test is done.
+        split_on: list of length N with grouping variable (e.g. speaker IDs),
+            on which the group-disjunct split is to be performed. Must be categorical.
+        stratify_on: dict with variable names (targets and/or further groupings)
+            the split should be stratified on (groupings could e.g. be sex, age class, etc).
+            Dict-Values are np.array-s of length N that contain the variable values.
+            All variables must be categorical.
+        weight: weight for each variable in stratify_on. Defines their amount of
+            contribution to the optimization score. Uniform weighting by default. Additional
+            key: "size_diff" defines how test size diff should be weighted.
+        test_size: test proportion in set(split_on), e.g. 10% of speakers to be held-out
+        k: number of different splits to be tried out
+        seed: random seed
 
     Returns:
-    train_i: (np.array) train set indices in X
-    test_i: (np.array) test set indices in X
-    info: (dict) detail information about reference and achieved prob distributions
-        "size_testset_in_spliton": intended test_size
-        "size_testset_in_X": optimized test proportion in X
-        "p_ref_{c}": reference class distribution calculated from stratify_on[c]
-        "p_test_{c}": test set class distribution calculated from stratify_on[c][test_i]
-    '''
+        train set indices in X
+        test set indices in X
+        dict with detail information about reference and achieved prob distributions
+            "size_testset_in_spliton": intended test_size
+            "size_testset_in_X": optimized test proportion in X
+            "p_ref_{c}": reference class distribution calculated from stratify_on[c]
+            "p_test_{c}": test set class distribution calculated from stratify_on[c][test_i]
 
+    """
     gss = GroupShuffleSplit(n_splits=k, test_size=test_size,
                             random_state=seed)
 
@@ -302,28 +315,27 @@ def binning(x: Union[list, np.array],
             nbins: int = 2,
             lower_boundaries: Union[list, np.array, dict] = None,
             seed: int = 42) -> np.array:
-    ''' 
-    bins numeric data.
+    """Bins numeric data.
 
-    If X is one-dimensional:
+        If X is one-dimensional:
         binning is done either intrinsically into nbins classes
         based on an equidistant percentile split, or extrinsically
         by using the lower_boundaries values.
-    If X is two-dimensional
+        If X is two-dimensional
         binning is done by kmeans clustering into nbins clusters
 
     Args:
-    x: (list, np.array) with numeric data.
-    nbins: (int) number of bins
-    lower_boundaries: (list) of lower bin boundaries.
-      If y is 1-dim and lower_boundaries is provided, nbins will be ignored
-      and y is binned extrinsically. The first value of lower_boundaries
-      is always corrected not to be higher than min(y).
-    seed: (int) random seed for kmeans
+        x: array with numeric data.
+        nbins: number of bins
+        lower_boundaries: (list of lower bin boundaries.
+            If y is 1-dim and lower_boundaries is provided, nbins will be ignored
+            and y is binned extrinsically. The first value of lower_boundaries
+            is always corrected not to be higher than min(y).
+        seed: random seed for kmeans
 
     Returns:
-    c: (np.array) integers as bin IDs 
-    '''
+        array of integers as bin IDs 
+    """
 
     assert ((nbins is not None) or (lower_boundaries is not None)), \
         "One of nbins or lower_boundaries must be set."
@@ -352,7 +364,6 @@ def binning(x: Union[list, np.array],
 
     else:
         # 2-dim array
-
         # centering+scaling
         sca = StandardScaler()
         xs = sca.fit_transform(x)
@@ -365,39 +376,41 @@ def binning(x: Union[list, np.array],
     return c
 
 
-def calc_split_score(test_i: np.array,
-                     stratify_on: dict,
-                     weight: dict,
-                     p_ref: dict,
-                     N: int,
-                     test_size: float,
-                     dev_i: np.array = None,
-                     dev_size: float = None) -> float:
-    ''' calculate split score based on class distribution IRADs and
-    differences in partition sizes of groups vs observations; smaller is better.
-    If dev_i and dev_size are not provided, the score is calculated for the train/test
-    split only. If they are provided the score is calculated for the train/dev/test split
+def calc_split_score(
+        test_i: np.array,
+        stratify_on: dict,
+        weight: dict,
+        p_ref: dict,
+        N: int,
+        test_size: float,
+        dev_i: np.array = None,
+        dev_size: float = None
+) -> float:
+    """Calculate split score based on class distribution IRADs and
+        differences in partition sizes of groups vs observations; smaller is better.
+        If dev_i and dev_size are not provided, the score is calculated for the train/test
+        split only. If they are provided the score is calculated for the train/dev/test split
 
     Args:
-    test_i: (np.array) of test set indices
-    stratify_on: (dict) Dict-keys are variable names (targets and/or further groupings)
-      the split should be stratified on (groupings could e.g. be sex, age class, etc).
-      Dict-Values are np.array-s of length N that contain the variable values.
-    weight: (dict) weight for each variable in stratify_on. Additional
-      key: "size_diff" that weights the grouping vs observation level test set size difference
-    p_ref: (dict) reference class distributions for all variables in stratify_on
-    N: (int) size of underlying data set
-    test_size: (float) test proportion in value set of variable, the disjunct grouping
-       has been carried out
-    dev_i: (np.array) of dev test indices
-    dev_size: (float) dev proportion in value set of variable, the disjunct grouping
-       has been carried out (this value should have been adjusted after splitting off the
-       test set)
+        test_i: array of test set indices
+        stratify_on: dict of variable names (targets and/or further groupings)
+            the split should be stratified on (groupings could e.g. be sex, age class, etc).
+            Dict-Values are np.array-s of length N that contain the variable values.
+        weight: weight for each variable in stratify_on. Additional
+            key: "size_diff" that weights the grouping vs observation level test set size difference
+        p_ref: reference class distributions for all variables in stratify_on
+        N: size of underlying data set
+        test_size: test proportion in value set of variable, the disjunct grouping
+            has been carried out
+        dev_i: array of dev indices
+        dev_size: dev proportion in value set of variable, the disjunct grouping
+            has been carried out (this value should have been adjusted after splitting off the
+            test set)
 
     Returns:
-    sco: (float) split score
-    '''
+        split score
 
+    """
     if dev_i is None:
         do_dev = False
     else:
@@ -442,15 +455,21 @@ def calc_split_score(test_i: np.array,
     return sco
 
 
-def calc_irad(p1: dict, p2: dict) -> Tuple[float, bool]:
-    ''' calculate information radius of prob dicts p1 and p2
+def calc_irad(
+        p1: dict,
+        p2: dict
+) -> Tuple[float, bool]:
+    """Calculate information radius of prob dicts p1 and p2.
+    
     Args:
-    p1, p2: (dict) of probabilities
+        p1, p2: dicts of probabilities
+
     Returns:
-    ir: (float) information radius
-    full_coverage: (bool) True if all elements in p1 occur in p2
-        and vice versa
-    '''
+        information radius
+        full coverage boolean which is True if all elements
+        in p1 occur in p2 and vice versa
+
+    """
 
     p, q = [], []
     full_coverage = True
@@ -475,19 +494,22 @@ def calc_irad(p1: dict, p2: dict) -> Tuple[float, bool]:
     return irad, full_coverage
 
 
-def size_check(d=Union[list, np.array, dict, pd.DataFrame], n=int):
-    ''' size check for d. If list, np.array it's length is tested.
-    If dict, the the length of all its values (which are lists) is
-    tested. If pd.DataFrame, shape[0] is tested.
+def size_check(
+        d=Union[list, np.array, dict, pd.DataFrame],
+        n=int
+) -> bool:
+    """Size check for d. If list, np.array it's length is tested.
+        If dict, the the length of all its values (which are lists) is
+        tested. If pd.DataFrame, shape[0] is tested.
 
     Args:
-    d: (list, np.array, dict, pd.DataFrame) input data
-    n: (int) reference length
+        d: input data
+        n: reference length
 
     Returns:
-    boolean: True if size requirement is met
-    '''
+        True if size requirement is met, else False
 
+    """
     if type(d) in [list, np.array] and len(d) != n:
         return False
     elif type(d) is dict:
@@ -500,16 +522,18 @@ def size_check(d=Union[list, np.array, dict, pd.DataFrame], n=int):
     return True
 
 
-def class_prob(y: Union[np.array, list]) -> float:
-    ''' returns class probabilities in y
+def class_prob(
+        y: Union[np.array, list]
+) -> dict:
+    """Returns class probabilities in y.
 
     Args:
-    y (array-like) of classes
+        y: array of classes
 
     Returns:
-    p (dict) assigning to each class in Y its maximum likelihood
-    '''
+        dict assigning to each class in Y its maximum likelihood
 
+    """
     p = {}
     N = len(y)
     c = Counter(y)
@@ -520,9 +544,7 @@ def class_prob(y: Union[np.array, list]) -> float:
 
 
 def is_categorical(x: Any) -> bool:
-    ''' returns True if type of x is in str or int*,
-    else False '''
-
+    """Returns True if type of x is in str or int*, else False."""
     if type(x) in [str, int, np.int16, np.int32, np.int64,
                    np.uint8, np.uint16, np.uint32]:
         return True
@@ -530,13 +552,15 @@ def is_categorical(x: Any) -> bool:
     return False
 
 
-def exit_message(full_target_coverage: bool, infx: str = "test") -> str:
-
+def exit_message(
+        full_target_coverage: bool,
+        infx: str = "test"
+) -> str:
+    """Exit messages."""
     if not full_target_coverage:
         return "not all partitions contain all target classes. What you can do:\n" \
             "(1) increase your dev and/or test partition, or\n" \
             "(2) reduce the amount of target classes by merging some of them."
-
     return f"\n:-o No {infx} set split found. Reason is, that for at least one of the\n" \
         f"stratification variables not all its values can make it into the {infx} set.\n" \
         f"This happens e.g. if the {infx} set size is chosen too small or\n" \

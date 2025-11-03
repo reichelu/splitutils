@@ -4,7 +4,7 @@
 
 ```bash
 $ virtualenv --python="/usr/bin/python3" venv_test_splitutils
-$ source venv_splitutils/bin/activate
+$ source venv_test_splitutils/bin/activate
 (venv_test_splitutils) $ pip install -r requirements.txt
 ```
 
