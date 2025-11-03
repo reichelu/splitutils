@@ -101,7 +101,8 @@ def optimize_traintest_split(X, y, split_on, stratify_on, weight=None,
 
 ```python
 def optimize_traindevtest_split(X, y, split_on, stratify_on, weight=None,
-                                dev_size=.1, test_size=.1, k=30, seed=42):
+                                dev_size=.1, test_size=.1, testset_not_smaller=False,
+                                k=30, seed=42):
 
     ''' optimize group-disjunct split into training, dev, and test set, which is
     guided by:
@@ -128,6 +129,8 @@ def optimize_traindevtest_split(X, y, split_on, stratify_on, weight=None,
     dev_size: (float) proportion in set(split_on) for dev set, e.g. 10% of speakers
       to be held-out
     test_size: (float) test proportion in set(split_on) for test set
+    testset_not_smaller (bool) if True, and if test_size >= dev_size, it is ensured, that
+      the resulting test set is not smaller than the dev set
     k: (int) number of different splits to be tried out
     seed: (int) random seed
 
