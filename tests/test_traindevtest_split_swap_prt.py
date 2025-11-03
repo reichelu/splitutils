@@ -3,13 +3,14 @@ import os
 import sys
 
 sys.path.append(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+)
 
 from splitutils import optimize_traindevtest_split
 
 
-def test_traindevtest_split():
-    """Tests traindevtest split."""
+def test_traindevtest_split_swap_prt():
+    """Tests traindevtest split with swapped partitions."""
     seed = 42
     np.random.seed(seed)
     n = 100
@@ -45,25 +46,53 @@ def test_traindevtest_split():
         weight=weights,
         dev_size=dev_size,
         test_size=test_size,
+        testset_not_smaller=True,
         k=k,
         seed=seed
     )
 
     reference = {
-        'score': 0.030828359568603338,
+        'score': 0.030828359568603535,
         'size_devset_in_spliton': 0.1,
-        'size_devset_in_X': 0.14,
+        'size_devset_in_X': 0.13,
         'size_testset_in_spliton': 0.1,
-        'size_testset_in_X': 0.13,
-        'p_target_ref': {'B': 0.49, 'A': 0.51},
-        'p_target_dev': {'A': 0.5, 'B': 0.5},
-        'p_target_test': {'A': 0.5384615384615384, 'B': 0.46153846153846156},
-        'p_strat_var1_ref': {'G': 0.56, 'F': 0.44},
-        'p_strat_var1_dev': {'G': 0.5714285714285714, 'F': 0.42857142857142855},
-        'p_strat_var1_test': {'F': 0.5384615384615384, 'G': 0.46153846153846156},
-        'p_strat_var2_ref': {'I': 0.48, 'H': 0.52},
-        'p_strat_var2_dev': {'I': 0.5, 'H': 0.5},
-        'p_strat_var2_test': {'I': 0.46153846153846156, 'H': 0.5384615384615384}
+        'size_testset_in_X': 0.14,
+        'p_target_ref': {
+            'B': 0.49,
+            'A': 0.51
+        },
+        'p_target_dev': {
+            'A': 0.5384615384615384,
+            'B': 0.46153846153846156
+        },
+        'p_target_test': {
+            'A': 0.5,
+            'B': 0.5
+        },
+        'p_strat_var1_ref': {
+            'G': 0.56,
+            'F': 0.44
+        },
+        'p_strat_var1_dev': {
+            'F': 0.5384615384615384,
+            'G': 0.46153846153846156
+        },
+        'p_strat_var1_test': {
+            'G': 0.5714285714285714,
+            'F': 0.42857142857142855
+        },
+        'p_strat_var2_ref': {
+            'I': 0.48,
+            'H': 0.52
+        },
+        'p_strat_var2_dev': {
+            'I': 0.46153846153846156,
+            'H': 0.5384615384615384
+        },
+        'p_strat_var2_test': {
+            'I': 0.5,
+            'H': 0.5
+        }
     }
 
     for key in info:
@@ -76,6 +105,5 @@ def test_traindevtest_split():
                 assert np.round(info[key][subkey], 4) == np.round(reference[key][subkey], 4), \
                     f"test fails for {key}.{subkey}"
 
-
 if __name__ == "__main__":
-    test_traindevtest_split()
+    test_traindevtest_split_swap_prt()

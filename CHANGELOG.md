@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.4.0 (2025-11-03)
+
+* updated `splitutils.optimize_traindevtest_split()`
+    * added `testset_not_smaller` boolean argument to let the user ensure that the testset won't be smaller than the devset
+
 ## Version 0.3.0 (2023-12-02)
 
 * unit tests added
